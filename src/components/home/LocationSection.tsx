@@ -1,4 +1,5 @@
 import { MapPin, Clock, Phone } from 'lucide-react';
+import { brand, getAddressLine, getWhatsAppUrl } from '@/config/brand';
 
 export function LocationSection() {
   return (
@@ -8,14 +9,14 @@ export function LocationSection() {
           {/* Map */}
           <div className="rounded-xl overflow-hidden shadow-lg h-[300px] lg:h-[400px]">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3922.9086850458287!2d-48.20507908520961!3d-7.186908894819897!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x92d90c1e4f0c4a6d%3A0x2f5c2e0f7e6e2d0e!2sAv.%20Amazonas%2C%20529%20-%20St.%20Central%2C%20Aragua%C3%ADna%20-%20TO!5e0!3m2!1spt-BR!2sbr!4v1703123456789!5m2!1spt-BR!2sbr"
+              src={brand.maps.embedUrl}
               width="100%"
               height="100%"
               style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Localização Villa Bella Floricultura"
+              title={`Localização ${brand.legalName}`}
             />
           </div>
 
@@ -38,8 +39,8 @@ export function LocationSection() {
                 <div>
                   <h3 className="font-semibold mb-1">Endereço</h3>
                   <p className="text-muted-foreground">
-                    Av. Amazonas, 529 - St. Central<br />
-                    Araguaína - TO, 77804-010
+                    {getAddressLine()}<br />
+                    {brand.locationLabel}, {brand.address.postalCode}
                   </p>
                 </div>
               </div>
@@ -51,8 +52,8 @@ export function LocationSection() {
                 <div>
                   <h3 className="font-semibold mb-1">Horário de funcionamento</h3>
                   <p className="text-muted-foreground">
-                    Segunda a Sábado: 8h às 18h<br />
-                    Domingo: 8h às 12h
+                    {brand.hours.weekdays}<br />
+                    {brand.hours.sunday}
                   </p>
                 </div>
               </div>
@@ -64,12 +65,12 @@ export function LocationSection() {
                 <div>
                   <h3 className="font-semibold mb-1">Contato</h3>
                   <a
-                    href="https://wa.me/5563992379935"
+                    href={getWhatsAppUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary hover:underline"
                   >
-                    +55 63 99237-9935
+                    {brand.contact.whatsapp.numberDisplay}
                   </a>
                 </div>
               </div>
@@ -79,10 +80,10 @@ export function LocationSection() {
             <div className="p-4 rounded-lg bg-success/10 border border-success/20">
               <div className="flex items-center gap-2">
                 <span className="inline-block w-3 h-3 bg-success rounded-full animate-pulse" />
-                <span className="font-semibold text-success">Entrega em até 3 horas</span>
+                <span className="font-semibold text-success">{brand.delivery.promiseShort}</span>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                Para pedidos realizados até às 15h, entregamos no mesmo dia!
+                {brand.delivery.sameDayCutoff}
               </p>
             </div>
           </div>

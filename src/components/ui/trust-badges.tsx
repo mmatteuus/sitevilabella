@@ -1,4 +1,5 @@
 import { LucideIcon, Shield, Truck, Clock, CreditCard, Heart, MessageCircle } from 'lucide-react';
+import { brand } from '@/config/brand';
 
 interface TrustBadgeProps {
   icon: LucideIcon;
@@ -24,7 +25,7 @@ export function TrustBadges() {
   const badges = [
     {
       icon: Truck,
-      title: 'Entrega em até 3 horas',
+      title: brand.delivery.promiseShort,
       description: 'Para pedidos na região',
     },
     {

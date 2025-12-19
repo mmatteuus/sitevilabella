@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { CheckCircle2, Package, Truck, Home, ArrowRight, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { brand, getWhatsAppUrl } from '@/config/brand';
 
 export default function ConfirmationPage() {
   const orderNumber = `VB${Date.now().toString().slice(-8)}`;
@@ -19,7 +20,7 @@ export default function ConfirmationPage() {
         </h1>
         
         <p className="text-lg text-muted-foreground mb-2 animate-slide-up" style={{ animationDelay: '100ms' }}>
-          Obrigado por comprar na Villa Bella Floricultura
+          Obrigado por comprar na {brand.legalName}
         </p>
         
         <p className="text-muted-foreground animate-slide-up" style={{ animationDelay: '150ms' }}>
@@ -105,7 +106,7 @@ export default function ConfirmationPage() {
             Dúvidas sobre seu pedido?
           </p>
           <a
-            href="https://wa.me/5563992379935?text=Olá! Gostaria de informações sobre meu pedido"
+            href={getWhatsAppUrl('Olá! Gostaria de informações sobre meu pedido')}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-primary hover:underline"

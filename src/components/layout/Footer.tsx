@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook } from 'lucide-react';
+import { brand, getAddressLine, getWhatsAppUrl } from '@/config/brand';
 
 export function Footer() {
   return (
@@ -10,7 +11,7 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <div>
-              <h3 className="font-display text-2xl font-bold text-primary-foreground">Villa Bella</h3>
+              <h3 className="font-display text-2xl font-bold text-primary-foreground">{brand.name}</h3>
               <p className="text-xs tracking-widest uppercase text-muted-foreground">Floricultura</p>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -18,7 +19,7 @@ export function Footer() {
             </p>
             <div className="flex gap-4">
               <a
-                href="https://instagram.com"
+                href={brand.links.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
@@ -27,7 +28,7 @@ export function Footer() {
                 <Instagram className="h-5 w-5" />
               </a>
               <a
-                href="https://facebook.com"
+                href={brand.links.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
@@ -98,35 +99,35 @@ export function Footer() {
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <p className="text-sm text-muted-foreground">
-                  Av. Amazonas, 529 - St. Central<br />
-                  Araguaína - TO
+                  {getAddressLine()}<br />
+                  {brand.locationLabel}
                 </p>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-primary shrink-0" />
                 <a
-                  href="https://wa.me/5563992379935"
+                  href={getWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  +55 63 99237-9935
+                  {brand.contact.whatsapp.numberDisplay}
                 </a>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-primary shrink-0" />
                 <a
-                  href="mailto:contato@villabella.com.br"
+                  href={`mailto:${brand.contact.email}`}
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  contato@villabella.com.br
+                  {brand.contact.email}
                 </a>
               </div>
               <div className="flex items-start gap-3">
                 <Clock className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <p className="text-sm text-muted-foreground">
-                  Seg - Sáb: 8h às 18h<br />
-                  Dom: 8h às 12h
+                  {brand.hours.weekdays}<br />
+                  {brand.hours.sunday}
                 </p>
               </div>
             </div>
@@ -135,7 +136,7 @@ export function Footer() {
             <div className="mt-6 p-3 rounded-lg bg-primary/10 border border-primary/20">
               <div className="flex items-center gap-2">
                 <span className="inline-block w-2 h-2 bg-success rounded-full animate-pulse" />
-                <span className="text-sm font-medium text-primary">Entrega em até 3 horas</span>
+                <span className="text-sm font-medium text-primary">{brand.delivery.promiseShort}</span>
               </div>
             </div>
           </div>
@@ -146,10 +147,10 @@ export function Footer() {
       <div className="border-t border-muted-foreground/10">
         <div className="container py-4 flex flex-col items-center gap-3 text-center">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Villa Bella Floricultura. Todos os direitos reservados.
+            © {new Date().getFullYear()} {brand.legalName}. Todos os direitos reservados.
           </p>
           <a
-            href="https://mtsferreira.dev"
+            href={brand.links.developer}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs font-semibold text-background hover:text-primary transition-colors"

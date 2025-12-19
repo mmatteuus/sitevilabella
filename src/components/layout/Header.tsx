@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { categories } from '@/data/products';
+import { brand } from '@/config/brand';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,15 +43,15 @@ export function Header() {
         <div className="container flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
             <Phone className="h-3.5 w-3.5" />
-            <span>WhatsApp: +55 63 99237-9935</span>
+            <span>WhatsApp: {brand.contact.whatsapp.numberDisplay}</span>
           </div>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
               <span className="inline-block w-2 h-2 bg-success rounded-full animate-pulse" />
-              Entrega em até 3 horas
+              {brand.delivery.promiseShort}
             </span>
             <span>|</span>
-            <span>Araguaína - TO</span>
+            <span>{brand.locationLabel}</span>
           </div>
         </div>
       </div>
@@ -109,7 +110,7 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <div className="flex flex-col items-center">
-              <span className="font-display text-xl md:text-2xl font-bold text-primary">Villa Bella</span>
+              <span className="font-display text-xl md:text-2xl font-bold text-primary">{brand.name}</span>
               <span className="text-[10px] md:text-xs text-muted-foreground tracking-widest uppercase">Floricultura</span>
             </div>
           </Link>

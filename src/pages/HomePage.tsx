@@ -7,6 +7,7 @@ import { Testimonials } from '@/components/home/Testimonials';
 import { Newsletter } from '@/components/home/Newsletter';
 import { LocationSection } from '@/components/home/LocationSection';
 import { categories, getBestSellers, occasions } from '@/data/products';
+import { brand } from '@/config/brand';
 
 export default function HomePage() {
   const bestSellers = getBestSellers();
@@ -29,7 +30,7 @@ export default function HomePage() {
           <div className="max-w-xl text-primary-foreground">
             <div className="inline-flex items-center gap-2 bg-primary/90 text-primary-foreground px-4 py-2 rounded-full text-sm mb-6 animate-slide-down">
               <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
-              Entrega em até 3 horas
+              {brand.delivery.promiseShort}
             </div>
             
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-slide-up">
@@ -39,7 +40,7 @@ export default function HomePage() {
             
             <p className="text-lg md:text-xl text-primary-foreground/90 mb-8 animate-slide-up" style={{ animationDelay: '100ms' }}>
               Especialistas em plantar flores e colher sorrisos. 
-              Entregamos emoções para Araguaína e região.
+              Entregamos emoções para {brand.address.city} e região.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-up" style={{ animationDelay: '200ms' }}>

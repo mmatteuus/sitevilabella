@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { brand, getWhatsAppUrl } from '@/config/brand';
 
 type Step = 'delivery' | 'message' | 'payment';
 
@@ -17,7 +18,7 @@ const deliveryPeriods = [
   { id: 'morning', label: 'Manhã', time: '8h - 12h', available: true },
   { id: 'afternoon', label: 'Tarde', time: '12h - 18h', available: true },
   { id: 'evening', label: 'Noite', time: '18h - 21h', available: true },
-  { id: 'express', label: 'Expressa', time: 'Em até 3 horas', available: true, extra: 15 },
+  { id: 'express', label: 'Expressa', time: brand.delivery.expressEta, available: true, extra: 15 },
 ];
 
 export default function CheckoutPage() {
@@ -36,8 +37,8 @@ export default function CheckoutPage() {
     number: '',
     complement: '',
     neighborhood: '',
-    city: 'Araguaína',
-    state: 'TO',
+    city: brand.address.city,
+    state: brand.address.state,
     zipCode: '',
     date: '',
     period: '',
@@ -289,7 +290,7 @@ export default function CheckoutPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="city">Cidade</Label>
-                        <Input id="city" value="Araguaína" disabled />
+                        <Input id="city" value={brand.address.city} disabled />
                       </div>
                       <div>
                         <Label htmlFor="state">Estado</Label>
@@ -587,7 +588,7 @@ export default function CheckoutPage() {
               {/* WhatsApp help */}
               <div className="mt-4 pt-4 border-t text-center">
                 <a
-                  href="https://wa.me/5563992379935?text=Olá! Preciso de ajuda com meu pedido"
+                  href={getWhatsAppUrl('Olá! Preciso de ajuda com meu pedido')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-primary hover:underline inline-flex items-center gap-1"

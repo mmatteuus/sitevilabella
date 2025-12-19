@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { ProductCard } from '@/components/product/ProductCard';
 import { useCart } from '@/contexts/CartContext';
 import { getRecommendedAddOns } from '@/data/products';
+import { brand, getWhatsAppUrl } from '@/config/brand';
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, subtotal } = useCart();
@@ -161,7 +162,7 @@ export default function CartPage() {
               <div className="mb-4 p-3 rounded-lg bg-success/10 border border-success/20">
                 <div className="flex items-center gap-2">
                   <Truck className="h-4 w-4 text-success" />
-                  <span className="text-sm font-medium text-success">Entrega em até 3 horas</span>
+                  <span className="text-sm font-medium text-success">{brand.delivery.promiseShort}</span>
                 </div>
               </div>
 
@@ -180,7 +181,7 @@ export default function CartPage() {
               {/* WhatsApp help */}
               <div className="mt-6 pt-4 border-t text-center">
                 <a
-                  href="https://wa.me/5563992379935?text=Olá! Preciso de ajuda com meu carrinho"
+                  href={getWhatsAppUrl('Olá! Preciso de ajuda com meu carrinho')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-primary hover:underline inline-flex items-center gap-1"

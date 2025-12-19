@@ -15,6 +15,7 @@ import {
   getCombinesWith, 
   getRecommendedAddOns 
 } from '@/data/products';
+import { brand } from '@/config/brand';
 
 export default function ProductPage() {
   const { slug } = useParams();
@@ -188,7 +189,7 @@ export default function ProductPage() {
             {/* Fast delivery badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 text-success">
               <Truck className="h-4 w-4" />
-              <span className="text-sm font-medium">Entrega em até 3 horas</span>
+              <span className="text-sm font-medium">{brand.delivery.promiseShort}</span>
             </div>
 
             <p className="text-muted-foreground">{product.description}</p>
