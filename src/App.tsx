@@ -9,6 +9,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { CartDrawer } from "@/components/layout/CartDrawer";
+import { BackToTopButton } from "@/components/layout/BackToTopButton";
 
 import HomePage from "./pages/HomePage";
 import CatalogPage from "./pages/CatalogPage";
@@ -60,6 +61,7 @@ const App = () => (
             </div>
             <CartDrawer />
             <WhatsAppButton />
+            <BackToTopButton />
           </BrowserRouter>
         </TooltipProvider>
       </CartProvider>

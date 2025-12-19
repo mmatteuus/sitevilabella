@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Product } from '@/data/products';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
+import { Product, products } from '@/data/products';
 
 export interface CartItem {
   product: Product;
@@ -29,6 +29,8 @@ const CART_STORAGE_KEY = 'villabella_cart';
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const hasSeededDemo = useRef(false);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -40,12 +42,43 @@ export function CartProvider({ children }: { children: ReactNode }) {
         console.error('Failed to load cart from storage');
       }
     }
+    setIsHydrated(true);
   }, []);
 
   // Save cart to localStorage on change
   useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+    if (isHydrated) {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    }
+  }, [items, isHydrated]);
+
+  useEffect(() => {
+    if (!isHydrated || hasSeededDemo.current || items.length > 0) return;
+
+    const sampleProducts = [
+      products.find((p) => p.id === '1'),
+      products.find((p) => p.id === '3'),
+    ].filter(Boolean) as Product[];
+
+    if (sampleProducts.length === 0) return;
+
+    setItems([
+      {
+        product: sampleProducts[0],
+        quantity: 1,
+        selectedVariation: sampleProducts[0].variations?.[0]?.id,
+        cardMessage: 'Parabéns pelo seu dia! Que seja lindo.',
+        cardSignature: 'Com carinho, Ana',
+      },
+      sampleProducts[1] && {
+        product: sampleProducts[1],
+        quantity: 2,
+        selectedVariation: sampleProducts[1].variations?.[1]?.id,
+      },
+    ].filter(Boolean) as CartItem[]);
+
+    hasSeededDemo.current = true;
+  }, [isHydrated, items.length]);
 
   const addItem = (product: Product, quantity = 1, variation?: string) => {
     setItems(prev => {

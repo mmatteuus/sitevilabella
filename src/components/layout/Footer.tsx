@@ -144,10 +144,18 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-muted-foreground/10">
-        <div className="container py-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+        <div className="container py-4 flex flex-col items-center gap-3 text-center">
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Villa Bella Floricultura. Todos os direitos reservados.
           </p>
+          <a
+            href="https://mtsferreira.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold text-background hover:text-primary transition-colors"
+          >
+            Desenvolvido por MtsFerreira
+          </a>
           <div className="flex items-center gap-4">
             <span className="text-xs text-muted-foreground">Pagamento seguro</span>
             <div className="flex items-center gap-2">
