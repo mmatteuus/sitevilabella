@@ -1,73 +1,33 @@
-# Welcome to your Lovable project
+# Site Vila Bella
 
-## Project info
+Este repositório contém o site institucional da Vila Bella, com landing page, catálogo de produtos, área de membros e fluxo completo de compras. Use-o como ponto de partida para ajustar textos, imagens e integrações específicas da marca.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Iniciando localmente
 
-## How can I edit this code?
+1. Instale as dependências com `npm install`.
+2. Rode `npm run dev` e abra o endereço fornecido pelo Vite para ver as alterações em tempo real.
 
-There are several ways of editing your application.
+## Scripts disponíveis
 
-**Use Lovable**
+- `npm run dev` – ambiente de desenvolvimento com recarga automática.
+- `npm run build` – gera o build de produção em `dist/`.
+- `npm run preview` – testa o build de produção localmente.
+- `npm run lint` – executa o ESLint em todo o projeto.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Deploy
 
-Changes made via Lovable will be committed automatically to this repo.
+1. Gere o build com `npm run build`.
+2. Faça o deploy da pasta `dist/` no serviço de hospedagem da sua escolha.
 
-**Use your preferred IDE**
+## Estrutura relevante
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- `src/pages` – páginas completas como home, catálogo, produto e fluxo de checkout.
+- `src/components` – componentes reutilizáveis de layout e UI (header, footer, botões, etc.).
+- `src/contexts` – contextos como autenticação e carrinho de compras.
+- `src/lib` e `src/hooks` – helpers e hooks personalizados usados pela aplicação.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Tecnologias
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- Vite + React + TypeScript
+- Tailwind CSS e shadcn-ui
+- TanStack Query, React Router, Sonner e outras bibliotecas de estado/ UI

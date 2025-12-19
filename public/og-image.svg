@@ -1,0 +1,20 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FDE8E8" />
+      <stop offset="100%" stop-color="#F6C5EA" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grad)" />
+  <g transform="translate(80 420)">
+    <text x="0" y="0" font-size="64" font-family="Inter, system-ui" font-weight="600" fill="#1F2933">
+      Vila Bella
+    </text>
+    <text x="0" y="90" font-size="32" font-family="Inter, system-ui" font-weight="400" fill="#1F2933">
+      Moda e lifestyle com alma
+    </text>
+  </g>
+  <circle cx="1075" cy="135" r="65" fill="#FFF5F6" opacity="0.9" />
+  <path d="M1050 115c15 0 25 10 25 25s-10 25-25 25c-15 0-25-10-25-25s10-25 25-25z" fill="#F083C0" />
+  <path d="M1075 120c10 0 18 8 18 18s-8 18-18 18-18-8-18-18 8-18 18-18z" fill="#E14F92" />
+</svg>
