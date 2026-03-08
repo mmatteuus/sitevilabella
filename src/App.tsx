@@ -70,55 +70,58 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CartProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <ErrorBoundary>
-              <div className="flex flex-col min-h-screen">
-                <AnnouncementBar />
-                <Header />
-                <div className="flex-1">
-                  <ScrollToTop />
-                  <PageTransition>
-                    <Routes>
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="/loja" element={<CatalogPage />} />
-                      <Route path="/categoria/:category" element={<CatalogPage />} />
-                      <Route path="/categoria/:category/:subcategory" element={<CatalogPage />} />
-                      <Route path="/produto/:slug" element={<ProductPage />} />
-                      <Route path="/carrinho" element={<CartPage />} />
-                      <Route path="/checkout" element={<CheckoutPage />} />
-                      <Route path="/confirmacao" element={<ConfirmationPage />} />
-                      <Route path="/entrar" element={<AuthPage />} />
-                      <Route path="/clube-vb" element={<ClubeVBPage />} />
-                      {/* Occasion pages */}
-                      <Route path="/ocasioes/:occasion" element={<OccasionPage />} />
-                      {/* Institutional pages */}
-                      <Route path="/entrega-frete" element={<EntregaFretePage />} />
-                      <Route path="/contato" element={<ContatoPage />} />
-                      <Route path="/politica-privacidade" element={<PoliticaPrivacidadePage />} />
-                      <Route path="/politica-cookies" element={<PoliticaCookiesPage />} />
-                      <Route path="/termos-condicoes" element={<TermosCondicoesPage />} />
-                      <Route path="/acessibilidade" element={<AcessibilidadePage />} />
-                      {/* Account */}
-                      <Route path="/minha-conta" element={<AccountLayout />}>
-                        <Route index element={<ProfilePage />} />
-                        <Route path="enderecos" element={<AddressesPage />} />
-                        <Route path="pedidos" element={<OrdersPage />} />
-                      </Route>
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </PageTransition>
+        <WishlistProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <ErrorBoundary>
+                <div className="flex flex-col min-h-screen">
+                  <AnnouncementBar />
+                  <Header />
+                  <div className="flex-1">
+                    <ScrollToTop />
+                    <PageTransition>
+                      <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/loja" element={<CatalogPage />} />
+                        <Route path="/categoria/:category" element={<CatalogPage />} />
+                        <Route path="/categoria/:category/:subcategory" element={<CatalogPage />} />
+                        <Route path="/produto/:slug" element={<ProductPage />} />
+                        <Route path="/carrinho" element={<CartPage />} />
+                        <Route path="/checkout" element={<CheckoutPage />} />
+                        <Route path="/confirmacao" element={<ConfirmationPage />} />
+                        <Route path="/entrar" element={<AuthPage />} />
+                        <Route path="/clube-vb" element={<ClubeVBPage />} />
+                        <Route path="/favoritos" element={<WishlistPage />} />
+                        {/* Occasion pages */}
+                        <Route path="/ocasioes/:occasion" element={<OccasionPage />} />
+                        {/* Institutional pages */}
+                        <Route path="/entrega-frete" element={<EntregaFretePage />} />
+                        <Route path="/contato" element={<ContatoPage />} />
+                        <Route path="/politica-privacidade" element={<PoliticaPrivacidadePage />} />
+                        <Route path="/politica-cookies" element={<PoliticaCookiesPage />} />
+                        <Route path="/termos-condicoes" element={<TermosCondicoesPage />} />
+                        <Route path="/acessibilidade" element={<AcessibilidadePage />} />
+                        {/* Account */}
+                        <Route path="/minha-conta" element={<AccountLayout />}>
+                          <Route index element={<ProfilePage />} />
+                          <Route path="enderecos" element={<AddressesPage />} />
+                          <Route path="pedidos" element={<OrdersPage />} />
+                        </Route>
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </PageTransition>
+                  </div>
+                  <Footer />
                 </div>
-                <Footer />
-              </div>
-              <CartDrawer />
-              <WhatsAppButton />
-              <BackToTopButton />
-            </ErrorBoundary>
-          </BrowserRouter>
-        </TooltipProvider>
+                <CartDrawer />
+                <WhatsAppButton />
+                <BackToTopButton />
+              </ErrorBoundary>
+            </BrowserRouter>
+          </TooltipProvider>
+        </WishlistProvider>
       </CartProvider>
     </AuthProvider>
   </QueryClientProvider>
