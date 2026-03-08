@@ -27,6 +27,7 @@ export function Header() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { totalItems, setIsCartOpen } = useCart();
   const { isAuthenticated } = useAuth();
+  const { count: wishlistCount } = useWishlist();
   const navigate = useNavigate();
 
   return (
