@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -9,7 +9,6 @@ import {
   Truck,
   CheckCircle2,
   Clock,
-  ChevronDown,
   Search,
   Filter,
   Eye,
@@ -17,7 +16,17 @@ import {
   BarChart3,
   ArrowUpRight,
   ShieldCheck,
+  Calendar,
 } from 'lucide-react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -41,6 +50,7 @@ import { useToast } from '@/hooks/use-toast';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type OrderStatus = 'received' | 'preparing' | 'on_the_way' | 'delivered' | 'cancelled';
+type DateFilter = 'today' | '7days' | 'month';
 
 interface AdminOrder {
   id: string;
@@ -147,6 +157,71 @@ const MOCK_ORDERS: AdminOrder[] = [
     period: 'Noite (18h–22h)',
     payment: 'PIX',
   },
+  {
+    id: 'VB12501',
+    date: '2026-03-05T11:00:00',
+    customer: 'Ricardo Mendes',
+    email: 'ricardo@email.com',
+    phone: '(63) 93333-6666',
+    items: 'Buquê Romântico × 1',
+    total: 189.90,
+    status: 'delivered',
+    address: 'Rua Brasil, 320 – Centro, Araguaína – TO',
+    period: 'Tarde (12h–18h)',
+    payment: 'PIX',
+  },
+  {
+    id: 'VB12480',
+    date: '2026-03-04T09:30:00',
+    customer: 'Patricia Lima',
+    email: 'patricia@email.com',
+    phone: '(63) 92222-7777',
+    items: 'Flores na Caneca × 2',
+    total: 159.80,
+    status: 'delivered',
+    address: 'Av. Filadélfia, 800 – Jardim Filadélfia, Araguaína – TO',
+    period: 'Manhã (8h–12h)',
+    payment: 'Cartão de Crédito',
+  },
+  {
+    id: 'VB12460',
+    date: '2026-03-03T14:00:00',
+    customer: 'Juliana Rocha',
+    email: 'juliana@email.com',
+    phone: '(63) 91111-8888',
+    items: 'Combo Girassol × 1',
+    total: 220.00,
+    status: 'delivered',
+    address: 'Rua das Acácias, 55 – Centro, Araguaína – TO',
+    period: 'Noite (18h–22h)',
+    payment: 'PIX',
+  },
+  {
+    id: 'VB12440',
+    date: '2026-03-02T10:20:00',
+    customer: 'Eduardo Santos',
+    email: 'eduardo@email.com',
+    phone: '(63) 90000-9999',
+    items: 'Rosa Única Premium × 5',
+    total: 275.00,
+    status: 'delivered',
+    address: 'Rua Palmeiras, 90 – Setor Sul, Araguaína – TO',
+    period: 'Tarde (12h–18h)',
+    payment: 'Cartão de Débito',
+  },
+  {
+    id: 'VB12420',
+    date: '2026-03-01T15:45:00',
+    customer: 'Camila Ferreira',
+    email: 'camila@email.com',
+    phone: '(63) 89999-0001',
+    items: 'Flower Box Elegance × 1',
+    total: 249.90,
+    status: 'delivered',
+    address: 'Rua Ipê, 15 – Bairro Novo, Araguaína – TO',
+    period: 'Manhã (8h–12h)',
+    payment: 'PIX',
+  },
 ];
 
 const MOCK_CUSTOMERS: AdminCustomer[] = [
@@ -227,6 +302,30 @@ const STATUS_NEXT_LABEL: Record<OrderStatus, string> = {
   cancelled: '',
 };
 
+// ─── Date filter config ───────────────────────────────────────────────────────
+const DATE_FILTER_OPTIONS: { value: DateFilter; label: string }[] = [
+  { value: 'today', label: 'Hoje' },
+  { value: '7days', label: 'Últimos 7 dias' },
+  { value: 'month', label: 'Este mês' },
+];
+
+function getFilterStartDate(filter: DateFilter): Date {
+  const now = new Date();
+  if (filter === 'today') {
+    const d = new Date(now);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  if (filter === '7days') {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 6);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  // month
+  return new Date(now.getFullYear(), now.getMonth(), 1);
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const fmt = (n: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
@@ -242,6 +341,53 @@ const fmtDate = (iso: string) =>
 
 const fmtDateShort = (iso: string) =>
   new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+// Build daily revenue data for chart
+function buildChartData(orders: AdminOrder[], filter: DateFilter) {
+  const start = getFilterStartDate(filter);
+  const now = new Date();
+
+  // Collect all dates in range
+  const days: string[] = [];
+  const cur = new Date(start);
+  while (cur <= now) {
+    days.push(cur.toISOString().split('T')[0]);
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  // Sum revenue per day
+  const revenueByDay: Record<string, number> = {};
+  days.forEach(d => (revenueByDay[d] = 0));
+
+  orders
+    .filter(o => o.status !== 'cancelled')
+    .forEach(o => {
+      const day = o.date.split('T')[0];
+      if (day in revenueByDay) {
+        revenueByDay[day] = (revenueByDay[day] || 0) + o.total;
+      }
+    });
+
+  return days.map(day => ({
+    date: day,
+    label: new Date(day + 'T12:00:00').toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: filter === 'month' ? '2-digit' : 'short',
+    }),
+    receita: revenueByDay[day],
+  }));
+}
+
+// ─── Custom Tooltip ───────────────────────────────────────────────────────────
+function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-lg border bg-card px-3 py-2 text-sm shadow-md">
+      <p className="font-medium mb-0.5">{label}</p>
+      <p className="text-primary font-bold">{fmt(payload[0].value)}</p>
+    </div>
+  );
+}
 
 // ─── Stat card ────────────────────────────────────────────────────────────────
 function StatCard({
@@ -262,7 +408,7 @@ function StatCard({
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground font-medium">{label}</span>
         <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Icon className="h-4.5 w-4.5 text-primary" />
+          <Icon className="h-4 w-4 text-primary" />
         </div>
       </div>
       <div>
@@ -286,7 +432,9 @@ export default function AdminPage() {
   const [orderSearch, setOrderSearch] = useState('');
   const [orderFilter, setOrderFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
+  const [dateFilter, setDateFilter] = useState<DateFilter>('7days');
 
+  // ── Filtered orders for table
   const filteredOrders = orders.filter(o => {
     const matchSearch =
       o.id.toLowerCase().includes(orderSearch.toLowerCase()) ||
@@ -296,35 +444,42 @@ export default function AdminPage() {
     return matchSearch && matchFilter;
   });
 
+  // ── Date-filtered orders for dashboard stats
+  const dateFilteredOrders = useMemo(() => {
+    const start = getFilterStartDate(dateFilter);
+    return orders.filter(o => new Date(o.date) >= start);
+  }, [orders, dateFilter]);
+
+  // ── Chart data
+  const chartData = useMemo(() => buildChartData(orders, dateFilter), [orders, dateFilter]);
+
+  // ── Stats from date-filtered set
+  const filteredRevenue = dateFilteredOrders
+    .filter(o => o.status !== 'cancelled')
+    .reduce((s, o) => s + o.total, 0);
+  const filteredOrderCount = dateFilteredOrders.length;
+  const pending = orders.filter(o => ['received', 'preparing', 'on_the_way'].includes(o.status)).length;
+
   const advanceStatus = (orderId: string) => {
+    let nextStatus: OrderStatus | null = null;
     setOrders(prev =>
       prev.map(o => {
         if (o.id !== orderId) return o;
         const next = STATUS_NEXT[o.status];
         if (!next) return o;
+        nextStatus = next;
         return { ...o, status: next };
       })
     );
-    const order = orders.find(o => o.id === orderId);
-    if (order) {
-      const next = STATUS_NEXT[order.status];
-      if (next) {
-        toast({
-          title: 'Status atualizado',
-          description: `Pedido #${orderId} → ${STATUS_CONFIG[next].label}`,
-        });
-      }
+    if (nextStatus) {
+      toast({
+        title: 'Status atualizado',
+        description: `Pedido #${orderId} → ${STATUS_CONFIG[nextStatus].label}`,
+      });
     }
   };
 
-  // Dashboard stats
-  const todayOrders = orders.filter(
-    o => new Date(o.date).toDateString() === new Date().toDateString()
-  );
-  const totalRevenue = orders
-    .filter(o => o.status !== 'cancelled')
-    .reduce((s, o) => s + o.total, 0);
-  const pending = orders.filter(o => ['received', 'preparing', 'on_the_way'].includes(o.status)).length;
+  const dateFilterLabel = DATE_FILTER_OPTIONS.find(d => d.value === dateFilter)?.label ?? '';
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -339,11 +494,9 @@ export default function AdminPage() {
             <p className="text-xs text-muted-foreground">Villa Bella Floricultura</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/">← Ver loja</Link>
-          </Button>
-        </div>
+        <Button asChild variant="ghost" size="sm">
+          <Link to="/">← Ver loja</Link>
+        </Button>
       </header>
 
       <main className="container max-w-7xl py-8">
@@ -370,20 +523,40 @@ export default function AdminPage() {
 
           {/* ── Dashboard tab ── */}
           <TabsContent value="dashboard" className="space-y-6">
+
+            {/* Date filter buttons */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              {DATE_FILTER_OPTIONS.map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => setDateFilter(opt.value)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+                    dateFilter === opt.value
+                      ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                      : 'bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Stat cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <StatCard
                 icon={ShoppingBag}
-                label="Pedidos hoje"
-                value={String(todayOrders.length)}
-                sub={`${orders.length} no total`}
-                trend="+12% vs ontem"
+                label="Pedidos"
+                value={String(filteredOrderCount)}
+                sub={dateFilterLabel}
+                trend={dateFilter === 'today' ? undefined : '+12% vs período anterior'}
               />
               <StatCard
                 icon={TrendingUp}
-                label="Receita total"
-                value={fmt(totalRevenue)}
-                sub="Sem cancelados"
-                trend="+8% este mês"
+                label="Receita"
+                value={fmt(filteredRevenue)}
+                sub={dateFilterLabel}
+                trend={dateFilter === 'today' ? undefined : '+8% vs período anterior'}
               />
               <StatCard
                 icon={Clock}
@@ -400,6 +573,46 @@ export default function AdminPage() {
               />
             </div>
 
+            {/* Revenue line chart */}
+            <div className="rounded-xl border bg-card">
+              <div className="flex items-center justify-between p-5 border-b">
+                <h2 className="font-semibold flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  Receita diária
+                  <span className="text-xs text-muted-foreground font-normal">— {dateFilterLabel}</span>
+                </h2>
+              </div>
+              <div className="p-4 h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(0 0% 90%)" />
+                    <XAxis
+                      dataKey="label"
+                      tick={{ fontSize: 11, fill: 'hsl(0 0% 45%)' }}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      tickFormatter={v => `R$${v}`}
+                      tick={{ fontSize: 11, fill: 'hsl(0 0% 45%)' }}
+                      tickLine={false}
+                      axisLine={false}
+                      width={55}
+                    />
+                    <Tooltip content={<ChartTooltip />} />
+                    <Line
+                      type="monotone"
+                      dataKey="receita"
+                      stroke="hsl(0 72% 51%)"
+                      strokeWidth={2.5}
+                      dot={{ r: 4, fill: 'hsl(0 72% 51%)', strokeWidth: 0 }}
+                      activeDot={{ r: 6, fill: 'hsl(0 72% 51%)', strokeWidth: 2, stroke: 'hsl(0 0% 100%)' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
             {/* Recent orders mini table */}
             <div className="rounded-xl border bg-card">
               <div className="flex items-center justify-between p-5 border-b">
@@ -411,12 +624,9 @@ export default function AdminPage() {
                   variant="ghost"
                   size="sm"
                   className="text-primary text-xs"
-                  onClick={() => {
-                    const tab = document.querySelector<HTMLButtonElement>('[data-state][value="orders"]');
-                    tab?.click();
-                  }}
+                  asChild
                 >
-                  Ver todos →
+                  <Link to="/admin">Ver todos →</Link>
                 </Button>
               </div>
               <div className="p-5 space-y-3">
@@ -499,7 +709,7 @@ export default function AdminPage() {
                     const cfg = STATUS_CONFIG[order.status];
                     const next = STATUS_NEXT[order.status];
                     return (
-                      <TableRow key={order.id} className="group">
+                      <TableRow key={order.id}>
                         <TableCell className="font-mono font-semibold text-primary">
                           #{order.id}
                         </TableCell>
@@ -522,7 +732,7 @@ export default function AdminPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1.5">
+                          <div className="flex items-center justify-end gap-1.5 flex-wrap">
                             <Button
                               variant="ghost"
                               size="sm"
@@ -536,11 +746,11 @@ export default function AdminPage() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 text-xs gap-1 hidden group-hover:flex"
+                                className="h-8 text-xs gap-1"
                                 onClick={() => advanceStatus(order.id)}
                               >
                                 <Edit2 className="h-3 w-3" />
-                                {STATUS_NEXT_LABEL[order.status]}
+                                <span className="hidden sm:inline">{STATUS_NEXT_LABEL[order.status]}</span>
                               </Button>
                             )}
                             <Button asChild variant="ghost" size="sm" className="h-8 w-8 p-0" title="Rastrear">
@@ -570,8 +780,8 @@ export default function AdminPage() {
                       <Button
                         size="sm"
                         onClick={() => {
-                          advanceStatus(selectedOrder.id);
                           const next = STATUS_NEXT[selectedOrder.status];
+                          advanceStatus(selectedOrder.id);
                           if (next) setSelectedOrder({ ...selectedOrder, status: next });
                         }}
                         className="gap-2"
