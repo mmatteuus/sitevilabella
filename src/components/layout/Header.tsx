@@ -166,6 +166,17 @@ export function Header() {
               </Button>
             </Link>
 
+            <Link to="/favoritos" className="relative">
+              <Button variant="ghost" size="icon" aria-label="Favoritos">
+                <Heart className="h-5 w-5" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-medium">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+
             <Button
               variant="ghost"
               size="icon"
