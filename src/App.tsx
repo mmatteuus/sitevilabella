@@ -34,6 +34,9 @@ import WishlistPage from "@/pages/WishlistPage";
 // Occasion pages
 import OccasionPage from "@/pages/occasions/OccasionPage";
 
+// Admin
+import AdminPage from "@/pages/admin/AdminPage";
+
 // Institutional pages
 import EntregaFretePage from "@/pages/institutional/EntregaFretePage";
 import ContatoPage from "@/pages/institutional/ContatoPage";
@@ -105,6 +108,8 @@ const App = () => (
                         <Route path="/politica-cookies" element={<PoliticaCookiesPage />} />
                         <Route path="/termos-condicoes" element={<TermosCondicoesPage />} />
                         <Route path="/acessibilidade" element={<AcessibilidadePage />} />
+                        {/* Admin */}
+                        <Route path="/admin" element={<AdminPage />} />
                         {/* Account */}
                         <Route path="/minha-conta" element={<AccountLayout />}>
                           <Route index element={<ProfilePage />} />
