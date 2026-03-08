@@ -44,30 +44,37 @@ interface ViaCepResult {
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { items, subtotal, discount, total, coupon, applyCoupon, removeCoupon, clearCart } = useCart();
-  const { addOrder } = useAuth();
+  const { addOrder, addresses } = useAuth();
   const { toast } = useToast();
 
   const [currentStep, setCurrentStep] = useState<Step>('delivery');
   const [isLoading, setIsLoading] = useState(false);
   const [cepLoading, setCepLoading] = useState(false);
+  const [selectedSavedAddressId, setSelectedSavedAddressId] = useState<string | null>(
+    addresses.find(a => a.isDefault)?.id ?? addresses[0]?.id ?? null
+  );
+  const [useNewAddress, setUseNewAddress] = useState(addresses.length === 0);
 
   // Coupon state (checkout also allows applying)
   const [couponInput, setCouponInput] = useState('');
 
   // Delivery state
-  const [deliveryData, setDeliveryData] = useState({
-    recipientName: '',
-    street: '',
-    number: '',
-    complement: '',
-    neighborhood: '',
-    city: brand.address.city,
-    state: brand.address.state,
-    zipCode: '',
-    date: '',
-    period: '',
-    isSurprise: false,
-    observations: '',
+  const [deliveryData, setDeliveryData] = useState(() => {
+    const def = addresses.find(a => a.isDefault) ?? addresses[0];
+    return {
+      recipientName: '',
+      street: def?.street ?? '',
+      number: def?.number ?? '',
+      complement: def?.complement ?? '',
+      neighborhood: def?.neighborhood ?? '',
+      city: def?.city ?? brand.address.city,
+      state: def?.state ?? brand.address.state,
+      zipCode: def?.zipCode ?? '',
+      date: '',
+      period: '',
+      isSurprise: false,
+      observations: '',
+    };
   });
 
   // Message state
