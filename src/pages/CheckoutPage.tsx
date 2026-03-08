@@ -100,6 +100,24 @@ export default function CheckoutPage() {
     { id: 'payment', label: 'Pagamento', icon: CreditCard },
   ];
 
+  // ── Apply a saved address to the form ─────────────────────────────────────
+  const applySavedAddress = useCallback((addressId: string) => {
+    const addr = addresses.find(a => a.id === addressId);
+    if (!addr) return;
+    setSelectedSavedAddressId(addressId);
+    setUseNewAddress(false);
+    setDeliveryData(prev => ({
+      ...prev,
+      street: addr.street,
+      number: addr.number,
+      complement: addr.complement ?? '',
+      neighborhood: addr.neighborhood,
+      city: addr.city,
+      state: addr.state,
+      zipCode: addr.zipCode,
+    }));
+  }, [addresses]);
+
   // ── CEP auto-fill via ViaCEP ──────────────────────────────────────────────
   const handleCepLookup = useCallback(async (cep: string) => {
     const cleaned = cep.replace(/\D/g, '');
