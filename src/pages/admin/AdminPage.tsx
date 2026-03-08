@@ -707,7 +707,39 @@ export default function AdminPage() {
 
           {/* ── Orders tab ── */}
           <TabsContent value="orders" className="space-y-4">
-            {/* Filters */}
+
+            {/* Period + export bar */}
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+                {DATE_FILTER_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setOrderDateFilter(opt.value)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+                      orderDateFilter === opt.value
+                        ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                        : 'bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 shrink-0"
+                onClick={handleExportCSV}
+                disabled={filteredOrders.length === 0}
+              >
+                <Download className="h-4 w-4" />
+                Exportar CSV
+                <span className="ml-1 text-muted-foreground font-normal">({filteredOrders.length})</span>
+              </Button>
+            </div>
+
+            {/* Search + status filter */}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
