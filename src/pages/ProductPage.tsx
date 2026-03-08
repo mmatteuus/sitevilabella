@@ -7,14 +7,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { ProductCard } from '@/components/product/ProductCard';
+import { ProductReviews } from '@/components/product/ProductReviews';
 import { TrustBadgesCompact } from '@/components/ui/trust-badges';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import { ImageLightbox, ZoomHint } from '@/components/product/ImageLightbox';
-import { 
-  getProductBySlug, 
-  getRelatedProducts, 
-  getCombinesWith, 
-  getRecommendedAddOns 
+import {
+  getProductBySlug,
+  getRelatedProducts,
+  getCombinesWith,
+  getRecommendedAddOns
 } from '@/data/products';
 import { brand } from '@/config/brand';
 
@@ -22,6 +24,7 @@ export default function ProductPage() {
   const { slug } = useParams();
   const product = getProductBySlug(slug || '');
   const { addItem } = useCart();
+  const { toggleItem, isWishlisted } = useWishlist();
 
   const [quantity, setQuantity] = useState(1);
   const [selectedVariation, setSelectedVariation] = useState(product?.variations?.[0]?.id || '');
@@ -62,6 +65,7 @@ export default function ProductPage() {
   const relatedProducts = getRelatedProducts(product.id);
   const combinesWith = getCombinesWith(product.id);
   const addOns = getRecommendedAddOns(product.id);
+  const wishlisted = isWishlisted(product.id);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -107,7 +111,7 @@ export default function ProductPage() {
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
           {/* Image Gallery */}
           <div className="space-y-4">
-            {/* Main image with zoom */}
+            {/* Main image */}
             <div
               className="group relative aspect-square rounded-xl overflow-hidden bg-muted cursor-zoom-in"
               onClick={() => setLightboxOpen(true)}
@@ -117,24 +121,14 @@ export default function ProductPage() {
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-
-              {/* Zoom hint */}
               <ZoomHint />
-              
-              {/* Badges */}
+
               <div className="absolute top-4 left-4 flex flex-col gap-2">
-                {product.isNew && (
-                  <Badge className="bg-success text-primary-foreground">Novo</Badge>
-                )}
-                {product.isBestSeller && (
-                  <Badge className="bg-gold text-foreground">Mais vendido</Badge>
-                )}
-                {discount > 0 && (
-                  <Badge variant="destructive">-{discount}%</Badge>
-                )}
+                {product.isNew && <Badge className="bg-success text-primary-foreground">Novo</Badge>}
+                {product.isBestSeller && <Badge className="bg-gold text-foreground">Mais vendido</Badge>}
+                {discount > 0 && <Badge variant="destructive">-{discount}%</Badge>}
               </div>
 
-              {/* Navigation arrows — stop propagation to not open lightbox */}
               {product.images.length > 1 && (
                 <>
                   <button
@@ -162,8 +156,8 @@ export default function ProductPage() {
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                      index === currentImageIndex ? 'border-primary' : 'border-transparent'
+                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                      index === currentImageIndex ? 'border-primary shadow-md' : 'border-transparent hover:border-muted-foreground'
                     }`}
                   >
                     <img
@@ -181,8 +175,7 @@ export default function ProductPage() {
           <div className="space-y-6">
             <div>
               <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">{product.name}</h1>
-              
-              {/* Rating */}
+
               <div className="flex items-center gap-2">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
@@ -197,7 +190,9 @@ export default function ProductPage() {
                   ))}
                 </div>
                 <span className="text-sm font-medium">{product.rating}</span>
-                <span className="text-sm text-muted-foreground">({product.reviewCount} avaliações)</span>
+                <a href="#avaliacoes" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  ({product.reviewCount} avaliações)
+                </a>
               </div>
             </div>
 
@@ -262,7 +257,7 @@ export default function ProductPage() {
                   {showMessageForm ? 'Fechar' : 'Adicionar'}
                 </button>
               </div>
-              
+
               {showMessageForm && (
                 <div className="space-y-3 animate-slide-down">
                   <div>
@@ -321,8 +316,14 @@ export default function ProductPage() {
                 Adicionar ao carrinho
               </Button>
 
-              <Button variant="outline" size="icon">
-                <Heart className="h-5 w-5" />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleItem(product)}
+                aria-label={wishlisted ? 'Remover dos favoritos' : 'Salvar nos favoritos'}
+                className={wishlisted ? 'text-primary border-primary' : ''}
+              >
+                <Heart className={`h-5 w-5 ${wishlisted ? 'fill-current' : ''}`} />
               </Button>
             </div>
 
@@ -339,41 +340,40 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Complete your gift - Add-ons */}
+        {/* Cross-sell sections */}
         {addOns.length > 0 && (
           <section className="mb-16">
             <h2 className="font-display text-2xl font-bold mb-6">Complete seu presente</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {addOns.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
+              {addOns.map((p) => <ProductCard key={p.id} product={p} />)}
             </div>
           </section>
         )}
 
-        {/* Combines with */}
         {combinesWith.length > 0 && (
           <section className="mb-16">
             <h2 className="font-display text-2xl font-bold mb-6">Você também pode gostar de...</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {combinesWith.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
+              {combinesWith.map((p) => <ProductCard key={p.id} product={p} />)}
             </div>
           </section>
         )}
 
-        {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <section>
+          <section className="mb-16">
             <h2 className="font-display text-2xl font-bold mb-6">Produtos relacionados</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {relatedProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
+              {relatedProducts.map((p) => <ProductCard key={p.id} product={p} />)}
             </div>
           </section>
         )}
+
+        {/* Reviews section */}
+        <ProductReviews
+          productId={product.id}
+          productRating={product.rating}
+          reviewCount={product.reviewCount}
+        />
       </div>
     </main>
   );
