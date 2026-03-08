@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingBag, User, Menu, X, ChevronDown, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { categories } from '@/data/products';
 import { brand } from '@/config/brand';
+import { SearchAutocomplete } from '@/components/layout/SearchAutocomplete';
 import {
   DropdownMenu,
   DropdownMenuContent,
