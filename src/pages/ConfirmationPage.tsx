@@ -90,13 +90,13 @@ export default function ConfirmationPage() {
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: '400ms' }}>
           <Button asChild variant="hero" size="lg">
-            <Link to="/">
-              Continuar comprando
+            <Link to={`/pedido/${orderNumber}`}>
+              Rastrear pedido
               <ArrowRight className="h-5 w-5" />
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link to="/minha-conta/pedidos">Ver meus pedidos</Link>
+            <Link to="/">Continuar comprando</Link>
           </Button>
         </div>
 
