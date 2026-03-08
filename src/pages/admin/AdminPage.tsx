@@ -469,16 +469,21 @@ export default function AdminPage() {
   const [orderFilter, setOrderFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
   const [dateFilter, setDateFilter] = useState<DateFilter>('7days');
+  const [orderDateFilter, setOrderDateFilter] = useState<DateFilter>('month');
 
-  // ── Filtered orders for table
-  const filteredOrders = orders.filter(o => {
-    const matchSearch =
-      o.id.toLowerCase().includes(orderSearch.toLowerCase()) ||
-      o.customer.toLowerCase().includes(orderSearch.toLowerCase()) ||
-      o.email.toLowerCase().includes(orderSearch.toLowerCase());
-    const matchFilter = orderFilter === 'all' || o.status === orderFilter;
-    return matchSearch && matchFilter;
-  });
+  // ── Filtered orders for table (search + status)
+  const filteredOrders = useMemo(() => {
+    const start = getFilterStartDate(orderDateFilter);
+    return orders.filter(o => {
+      const matchDate = new Date(o.date) >= start;
+      const matchSearch =
+        o.id.toLowerCase().includes(orderSearch.toLowerCase()) ||
+        o.customer.toLowerCase().includes(orderSearch.toLowerCase()) ||
+        o.email.toLowerCase().includes(orderSearch.toLowerCase());
+      const matchFilter = orderFilter === 'all' || o.status === orderFilter;
+      return matchDate && matchSearch && matchFilter;
+    });
+  }, [orders, orderSearch, orderFilter, orderDateFilter]);
 
   // ── Date-filtered orders for dashboard stats
   const dateFilteredOrders = useMemo(() => {
@@ -515,7 +520,17 @@ export default function AdminPage() {
     }
   };
 
+  const handleExportCSV = () => {
+    const periodLabel = DATE_FILTER_OPTIONS.find(d => d.value === orderDateFilter)?.label ?? orderDateFilter;
+    exportToCSV(filteredOrders, periodLabel);
+    toast({
+      title: 'CSV exportado',
+      description: `${filteredOrders.length} pedido(s) exportado(s) — ${periodLabel}`,
+    });
+  };
+
   const dateFilterLabel = DATE_FILTER_OPTIONS.find(d => d.value === dateFilter)?.label ?? '';
+  const orderDateFilterLabel = DATE_FILTER_OPTIONS.find(d => d.value === orderDateFilter)?.label ?? '';
 
   return (
     <div className="min-h-screen bg-muted/30">
