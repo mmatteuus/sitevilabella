@@ -288,7 +288,7 @@ export const products: Product[] = [
     subcategory: "flores-caneca",
     tags: ["presente", "aniversário", "útil"],
     images: [
-      "https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=800",
+      floresCanecaImg,
     ],
     addOnsRecommended: ["7", "8"],
     combinaCom: ["4", "5"],
