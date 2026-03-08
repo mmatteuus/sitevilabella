@@ -391,7 +391,12 @@ export default function CheckoutPage() {
                         <Label htmlFor="number">Número *</Label>
                         <Input id="number"
                           value={deliveryData.number}
-                          onChange={(e) => setDeliveryData({ ...deliveryData, number: e.target.value })}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9A-Za-z]/g, '').slice(0, 10);
+                            setDeliveryData({ ...deliveryData, number: val });
+                          }}
+                          inputMode="numeric"
+                          placeholder="42"
                           required />
                       </div>
                     </div>
