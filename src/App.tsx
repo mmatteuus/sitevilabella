@@ -108,6 +108,8 @@ const App = () => (
                         <Route path="/politica-cookies" element={<PoliticaCookiesPage />} />
                         <Route path="/termos-condicoes" element={<TermosCondicoesPage />} />
                         <Route path="/acessibilidade" element={<AcessibilidadePage />} />
+                        {/* Admin */}
+                        <Route path="/admin" element={<AdminPage />} />
                         {/* Account */}
                         <Route path="/minha-conta" element={<AccountLayout />}>
                           <Route index element={<ProfilePage />} />
