@@ -27,6 +27,7 @@ import AccountLayout from "@/pages/account/AccountLayout";
 import ProfilePage from "@/pages/account/ProfilePage";
 import AddressesPage from "@/pages/account/AddressesPage";
 import OrdersPage from "@/pages/account/OrdersPage";
+import OrderTrackingPage from "@/pages/OrderTrackingPage";
 import NotFound from "@/pages/NotFound";
 import WishlistPage from "@/pages/WishlistPage";
 
