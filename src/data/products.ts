@@ -193,7 +193,7 @@ export const products: Product[] = [
     subcategory: "combo-mes",
     tags: ["aniversário", "parabéns", "alegria", "girassol"],
     images: [
-      "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?w=800",
+      girassolImg,
       "https://images.unsplash.com/photo-1551731409-43eb3e517a1a?w=800",
     ],
     addOnsRecommended: ["7", "10"],
