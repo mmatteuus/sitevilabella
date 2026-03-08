@@ -10,6 +10,7 @@ import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { CartDrawer } from "@/components/layout/CartDrawer";
 import { BackToTopButton } from "@/components/layout/BackToTopButton";
+import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 import { useEffect } from "react";
 
@@ -73,6 +74,7 @@ const App = () => (
           <BrowserRouter>
             <ErrorBoundary>
               <div className="flex flex-col min-h-screen">
+                <AnnouncementBar />
                 <Header />
                 <div className="flex-1">
                   <ScrollToTop />

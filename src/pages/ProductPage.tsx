@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Minus, Plus, Heart, Share2, Truck, Shield, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Minus, Plus, Heart, Share2, Truck, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { ProductCard } from '@/components/product/ProductCard';
 import { TrustBadgesCompact } from '@/components/ui/trust-badges';
 import { useCart } from '@/contexts/CartContext';
+import { ImageLightbox, ZoomHint } from '@/components/product/ImageLightbox';
 import { 
   getProductBySlug, 
   getRelatedProducts, 
@@ -25,9 +26,27 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedVariation, setSelectedVariation] = useState(product?.variations?.[0]?.id || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [cardMessage, setCardMessage] = useState('');
   const [cardSignature, setCardSignature] = useState('');
   const [showMessageForm, setShowMessageForm] = useState(false);
+
+  const imageCount = product?.images.length ?? 1;
+
+  const nextImage = useCallback(() => {
+    setCurrentImageIndex((prev) => (prev + 1) % imageCount);
+  }, [imageCount]);
+
+  const prevImage = useCallback(() => {
+    setCurrentImageIndex((prev) => (prev - 1 + imageCount) % imageCount);
+  }, [imageCount]);
+
+  const handleAddToCart = useCallback(() => {
+    if (!product) return;
+    addItem(product, quantity, selectedVariation ?
+      product.variations?.find(v => v.id === selectedVariation)?.name : undefined
+    );
+  }, [addItem, product, quantity, selectedVariation]);
 
   if (!product) {
     return (
@@ -55,23 +74,22 @@ export default function ProductPage() {
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
-  const handleAddToCart = () => {
-    addItem(product, quantity, selectedVariation ? 
-      product.variations?.find(v => v.id === selectedVariation)?.name : undefined
-    );
-  };
-
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
-  };
-
   return (
     <main className="py-8">
       <div className="container">
+        {/* Lightbox */}
+        {lightboxOpen && (
+          <ImageLightbox
+            images={product.images}
+            currentIndex={currentImageIndex}
+            productName={product.name}
+            onClose={() => setLightboxOpen(false)}
+            onNext={nextImage}
+            onPrev={prevImage}
+            onSelect={setCurrentImageIndex}
+          />
+        )}
+
         {/* Breadcrumb */}
         <nav className="text-sm text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary">Home</Link>
@@ -89,12 +107,19 @@ export default function ProductPage() {
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
           {/* Image Gallery */}
           <div className="space-y-4">
-            <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+            {/* Main image with zoom */}
+            <div
+              className="group relative aspect-square rounded-xl overflow-hidden bg-muted cursor-zoom-in"
+              onClick={() => setLightboxOpen(true)}
+            >
               <img
                 src={product.images[currentImageIndex]}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
+
+              {/* Zoom hint */}
+              <ZoomHint />
               
               {/* Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -109,19 +134,19 @@ export default function ProductPage() {
                 )}
               </div>
 
-              {/* Navigation arrows */}
+              {/* Navigation arrows — stop propagation to not open lightbox */}
               {product.images.length > 1 && (
                 <>
                   <button
-                    onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 hover:bg-background flex items-center justify-center shadow-md transition-colors"
+                    onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 hover:bg-background flex items-center justify-center shadow-md transition-colors opacity-0 group-hover:opacity-100"
                     aria-label="Imagem anterior"
                   >
                     <ChevronLeft className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 hover:bg-background flex items-center justify-center shadow-md transition-colors"
+                    onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 hover:bg-background flex items-center justify-center shadow-md transition-colors opacity-0 group-hover:opacity-100"
                     aria-label="Próxima imagem"
                   >
                     <ChevronRight className="h-5 w-5" />
