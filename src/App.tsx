@@ -28,6 +28,7 @@ import ProfilePage from "@/pages/account/ProfilePage";
 import AddressesPage from "@/pages/account/AddressesPage";
 import OrdersPage from "@/pages/account/OrdersPage";
 import NotFound from "@/pages/NotFound";
+import WishlistPage from "@/pages/WishlistPage";
 
 // Occasion pages
 import OccasionPage from "@/pages/occasions/OccasionPage";
