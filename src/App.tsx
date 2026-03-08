@@ -34,6 +34,9 @@ import WishlistPage from "@/pages/WishlistPage";
 // Occasion pages
 import OccasionPage from "@/pages/occasions/OccasionPage";
 
+// Admin
+import AdminPage from "@/pages/admin/AdminPage";
+
 // Institutional pages
 import EntregaFretePage from "@/pages/institutional/EntregaFretePage";
 import ContatoPage from "@/pages/institutional/ContatoPage";
