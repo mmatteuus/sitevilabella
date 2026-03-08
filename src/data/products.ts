@@ -215,7 +215,7 @@ export const products: Product[] = [
     subcategory: "flower-box",
     tags: ["romântico", "luxo", "presente", "especial"],
     images: [
-      "https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=800",
+      flowerBoxImg,
       "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=800",
     ],
     variations: [
