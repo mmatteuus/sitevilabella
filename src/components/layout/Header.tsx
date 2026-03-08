@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, User, Menu, X, ChevronDown, Phone } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, ChevronDown, Phone, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,19 +22,11 @@ import {
 } from '@/components/ui/sheet';
 
 export function Header() {
-  const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { totalItems, setIsCartOpen } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/loja?busca=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery('');
-    }
-  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -108,7 +100,7 @@ export function Header() {
           </Sheet>
 
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 shrink-0">
             <div className="flex flex-col items-center">
               <span className="font-display text-xl md:text-2xl font-bold text-primary">{brand.name}</span>
               <span className="text-[10px] md:text-xs text-muted-foreground tracking-widest uppercase">Floricultura</span>
@@ -148,28 +140,26 @@ export function Header() {
             </Link>
           </nav>
 
-          {/* Search */}
-          <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-md mx-4">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Buscar flores, cestas, chocolates..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4"
-              />
-            </div>
-          </form>
+          {/* Desktop Search — with autocomplete */}
+          <div className="hidden lg:block flex-1 max-w-md mx-4">
+            <SearchAutocomplete />
+          </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => navigate('/loja')}>
-              <Search className="h-5 w-5" />
+          <div className="flex items-center gap-1">
+            {/* Mobile search toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setMobileSearchOpen((v) => !v)}
+              aria-label="Abrir busca"
+            >
+              {mobileSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
             </Button>
 
             <Link to={isAuthenticated ? '/minha-conta' : '/entrar'}>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" aria-label="Minha conta">
                 <User className="h-5 w-5" />
               </Button>
             </Link>
@@ -179,16 +169,27 @@ export function Header() {
               size="icon"
               className="relative"
               onClick={() => setIsCartOpen(true)}
+              aria-label="Carrinho de compras"
             >
               <ShoppingBag className="h-5 w-5" />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium">
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium animate-scale-in">
                   {totalItems}
                 </span>
               )}
             </Button>
           </div>
         </div>
+
+        {/* Mobile search bar — expandable */}
+        {mobileSearchOpen && (
+          <div className="lg:hidden pb-3 animate-slide-down">
+            <SearchAutocomplete
+              autoFocus
+              onClose={() => setMobileSearchOpen(false)}
+            />
+          </div>
+        )}
       </div>
     </header>
   );
