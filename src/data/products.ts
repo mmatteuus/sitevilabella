@@ -242,7 +242,7 @@ export const products: Product[] = [
     subcategory: "ramalhete",
     tags: ["aniversário", "agradecimento", "simples"],
     images: [
-      "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800",
+      ramalheteImg,
     ],
     addOnsRecommended: ["7"],
     combinaCom: ["2", "6"],
