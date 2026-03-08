@@ -262,7 +262,7 @@ export const products: Product[] = [
     subcategory: "rosa-unica",
     tags: ["romântico", "amor", "simples", "clássico"],
     images: [
-      "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=800",
+      rosaUnicaImg,
     ],
     variations: [
       { id: "vermelho", name: "Vermelho", color: "#DC2626" },
