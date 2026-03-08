@@ -148,9 +148,21 @@ export function CartDrawer() {
 
             {/* Footer */}
             <div className="border-t pt-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">Subtotal</span>
-                <span className="text-lg font-bold text-primary">{formatPrice(subtotal)}</span>
+              <div className="space-y-1 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="font-medium">{formatPrice(subtotal)}</span>
+                </div>
+                {discount > 0 && (
+                  <div className="flex items-center justify-between text-success">
+                    <span>Desconto ({coupon?.code})</span>
+                    <span>– {formatPrice(discount)}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between text-base font-bold pt-1 border-t mt-1">
+                  <span>Total</span>
+                  <span className="text-primary">{formatPrice(total)}</span>
+                </div>
               </div>
               <div className="text-xs text-muted-foreground text-center">
                 Frete calculado no checkout
