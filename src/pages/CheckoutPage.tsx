@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Check, ChevronRight, MapPin, MessageCircle, CreditCard, Truck, ArrowLeft, Tag, X, Loader2 } from 'lucide-react';
+import { Check, ChevronRight, MapPin, MessageCircle, CreditCard, Truck, ArrowLeft, Tag, X, Loader2, BookMarked, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
