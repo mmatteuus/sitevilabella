@@ -74,6 +74,7 @@ const App = () => (
           <BrowserRouter>
             <ErrorBoundary>
               <div className="flex flex-col min-h-screen">
+                <AnnouncementBar />
                 <Header />
                 <div className="flex-1">
                   <ScrollToTop />
