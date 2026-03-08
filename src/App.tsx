@@ -92,6 +92,7 @@ const App = () => (
                         <Route path="/carrinho" element={<CartPage />} />
                         <Route path="/checkout" element={<CheckoutPage />} />
                         <Route path="/confirmacao" element={<ConfirmationPage />} />
+                        <Route path="/pedido/:id" element={<OrderTrackingPage />} />
                         <Route path="/entrar" element={<AuthPage />} />
                         <Route path="/clube-vb" element={<ClubeVBPage />} />
                         <Route path="/favoritos" element={<WishlistPage />} />
