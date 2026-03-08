@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Check, ChevronRight, MapPin, MessageCircle, CreditCard, Truck, ArrowLeft, Tag, X, Loader2 } from 'lucide-react';
+import { Check, ChevronRight, MapPin, MessageCircle, CreditCard, Truck, ArrowLeft, Tag, X, Loader2, BookMarked, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,30 +44,37 @@ interface ViaCepResult {
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { items, subtotal, discount, total, coupon, applyCoupon, removeCoupon, clearCart } = useCart();
-  const { addOrder } = useAuth();
+  const { addOrder, addresses } = useAuth();
   const { toast } = useToast();
 
   const [currentStep, setCurrentStep] = useState<Step>('delivery');
   const [isLoading, setIsLoading] = useState(false);
   const [cepLoading, setCepLoading] = useState(false);
+  const [selectedSavedAddressId, setSelectedSavedAddressId] = useState<string | null>(
+    addresses.find(a => a.isDefault)?.id ?? addresses[0]?.id ?? null
+  );
+  const [useNewAddress, setUseNewAddress] = useState(addresses.length === 0);
 
   // Coupon state (checkout also allows applying)
   const [couponInput, setCouponInput] = useState('');
 
   // Delivery state
-  const [deliveryData, setDeliveryData] = useState({
-    recipientName: '',
-    street: '',
-    number: '',
-    complement: '',
-    neighborhood: '',
-    city: brand.address.city,
-    state: brand.address.state,
-    zipCode: '',
-    date: '',
-    period: '',
-    isSurprise: false,
-    observations: '',
+  const [deliveryData, setDeliveryData] = useState(() => {
+    const def = addresses.find(a => a.isDefault) ?? addresses[0];
+    return {
+      recipientName: '',
+      street: def?.street ?? '',
+      number: def?.number ?? '',
+      complement: def?.complement ?? '',
+      neighborhood: def?.neighborhood ?? '',
+      city: def?.city ?? brand.address.city,
+      state: def?.state ?? brand.address.state,
+      zipCode: def?.zipCode ?? '',
+      date: '',
+      period: '',
+      isSurprise: false,
+      observations: '',
+    };
   });
 
   // Message state
@@ -92,6 +99,24 @@ export default function CheckoutPage() {
     { id: 'message', label: 'Mensagem', icon: MessageCircle },
     { id: 'payment', label: 'Pagamento', icon: CreditCard },
   ];
+
+  // ── Apply a saved address to the form ─────────────────────────────────────
+  const applySavedAddress = useCallback((addressId: string) => {
+    const addr = addresses.find(a => a.id === addressId);
+    if (!addr) return;
+    setSelectedSavedAddressId(addressId);
+    setUseNewAddress(false);
+    setDeliveryData(prev => ({
+      ...prev,
+      street: addr.street,
+      number: addr.number,
+      complement: addr.complement ?? '',
+      neighborhood: addr.neighborhood,
+      city: addr.city,
+      state: addr.state,
+      zipCode: addr.zipCode,
+    }));
+  }, [addresses]);
 
   // ── CEP auto-fill via ViaCEP ──────────────────────────────────────────────
   const handleCepLookup = useCallback(async (cep: string) => {
@@ -265,7 +290,64 @@ export default function CheckoutPage() {
             {/* Step 1: Delivery */}
             {currentStep === 'delivery' && (
               <form onSubmit={handleDeliverySubmit} className="space-y-6">
-                <div className="rounded-xl border bg-card p-6">
+                {/* ── Saved address picker ──────────────────────────── */}
+                {addresses.length > 0 && (
+                  <div className="rounded-xl border bg-card p-6 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-display text-lg font-bold flex items-center gap-2">
+                        <BookMarked className="h-5 w-5 text-primary" />
+                        Endereços salvos
+                      </h2>
+                    </div>
+                    <div className="space-y-2">
+                      {addresses.map((addr) => (
+                        <button
+                          key={addr.id}
+                          type="button"
+                          onClick={() => applySavedAddress(addr.id)}
+                          className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                            selectedSavedAddressId === addr.id && !useNewAddress
+                              ? 'border-primary bg-primary/5'
+                              : 'hover:bg-accent/40'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <span className="font-medium text-sm">{addr.name}</span>
+                              {addr.isDefault && (
+                                <span className="ml-2 text-xs bg-primary/15 text-primary px-1.5 py-0.5 rounded-full">Padrão</span>
+                              )}
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {addr.street}, {addr.number}{addr.complement ? ` - ${addr.complement}` : ''} · {addr.neighborhood}
+                              </p>
+                              <p className="text-xs text-muted-foreground">CEP {addr.zipCode} · {addr.city}/{addr.state}</p>
+                            </div>
+                            <div className={`mt-1 h-4 w-4 rounded-full border-2 flex-shrink-0 ${
+                              selectedSavedAddressId === addr.id && !useNewAddress
+                                ? 'border-primary bg-primary'
+                                : 'border-muted-foreground'
+                            }`} />
+                          </div>
+                        </button>
+                      ))}
+
+                      <button
+                        type="button"
+                        onClick={() => { setUseNewAddress(true); setSelectedSavedAddressId(null); }}
+                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                          useNewAddress ? 'border-primary bg-primary/5' : 'hover:bg-accent/40'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2 text-sm font-medium">
+                          <PlusCircle className="h-4 w-4 text-primary" />
+                          Usar novo endereço
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className={`rounded-xl border bg-card p-6 ${addresses.length > 0 && !useNewAddress ? 'opacity-60 pointer-events-none select-none' : ''}`}>
                   <h2 className="font-display text-xl font-bold mb-6">Endereço de entrega</h2>
                   <div className="grid gap-4">
                     <div>
