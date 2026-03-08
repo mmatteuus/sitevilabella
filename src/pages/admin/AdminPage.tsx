@@ -17,6 +17,7 @@ import {
   ArrowUpRight,
   ShieldCheck,
   Calendar,
+  Download,
 } from 'lucide-react';
 import {
   LineChart,
@@ -378,6 +379,41 @@ function buildChartData(orders: AdminOrder[], filter: DateFilter) {
   }));
 }
 
+// ─── CSV export ───────────────────────────────────────────────────────────────
+function exportToCSV(rows: AdminOrder[], periodLabel: string) {
+  const escape = (v: string | number) => {
+    const s = String(v).replace(/"/g, '""');
+    return /[",\n]/.test(s) ? `"${s}"` : s;
+  };
+
+  const headers = ['Pedido', 'Data', 'Cliente', 'E-mail', 'Telefone', 'Itens', 'Total (R$)', 'Status', 'Endereço', 'Período', 'Pagamento'];
+  const lines = [
+    headers.join(','),
+    ...rows.map(o => [
+      escape(o.id),
+      escape(new Date(o.date).toLocaleString('pt-BR')),
+      escape(o.customer),
+      escape(o.email),
+      escape(o.phone),
+      escape(o.items),
+      escape(o.total.toFixed(2).replace('.', ',')),
+      escape(STATUS_CONFIG[o.status].label),
+      escape(o.address),
+      escape(o.period),
+      escape(o.payment),
+    ].join(',')),
+  ];
+
+  const bom = '\uFEFF'; // UTF-8 BOM for Excel
+  const blob = new Blob([bom + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `pedidos-villa-bella-${periodLabel.toLowerCase().replace(/\s+/g, '-')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ─── Custom Tooltip ───────────────────────────────────────────────────────────
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
   if (!active || !payload?.length) return null;
@@ -433,16 +469,21 @@ export default function AdminPage() {
   const [orderFilter, setOrderFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
   const [dateFilter, setDateFilter] = useState<DateFilter>('7days');
+  const [orderDateFilter, setOrderDateFilter] = useState<DateFilter>('month');
 
-  // ── Filtered orders for table
-  const filteredOrders = orders.filter(o => {
-    const matchSearch =
-      o.id.toLowerCase().includes(orderSearch.toLowerCase()) ||
-      o.customer.toLowerCase().includes(orderSearch.toLowerCase()) ||
-      o.email.toLowerCase().includes(orderSearch.toLowerCase());
-    const matchFilter = orderFilter === 'all' || o.status === orderFilter;
-    return matchSearch && matchFilter;
-  });
+  // ── Filtered orders for table (search + status)
+  const filteredOrders = useMemo(() => {
+    const start = getFilterStartDate(orderDateFilter);
+    return orders.filter(o => {
+      const matchDate = new Date(o.date) >= start;
+      const matchSearch =
+        o.id.toLowerCase().includes(orderSearch.toLowerCase()) ||
+        o.customer.toLowerCase().includes(orderSearch.toLowerCase()) ||
+        o.email.toLowerCase().includes(orderSearch.toLowerCase());
+      const matchFilter = orderFilter === 'all' || o.status === orderFilter;
+      return matchDate && matchSearch && matchFilter;
+    });
+  }, [orders, orderSearch, orderFilter, orderDateFilter]);
 
   // ── Date-filtered orders for dashboard stats
   const dateFilteredOrders = useMemo(() => {
@@ -479,7 +520,17 @@ export default function AdminPage() {
     }
   };
 
+  const handleExportCSV = () => {
+    const periodLabel = DATE_FILTER_OPTIONS.find(d => d.value === orderDateFilter)?.label ?? orderDateFilter;
+    exportToCSV(filteredOrders, periodLabel);
+    toast({
+      title: 'CSV exportado',
+      description: `${filteredOrders.length} pedido(s) exportado(s) — ${periodLabel}`,
+    });
+  };
+
   const dateFilterLabel = DATE_FILTER_OPTIONS.find(d => d.value === dateFilter)?.label ?? '';
+  const orderDateFilterLabel = DATE_FILTER_OPTIONS.find(d => d.value === orderDateFilter)?.label ?? '';
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -656,7 +707,39 @@ export default function AdminPage() {
 
           {/* ── Orders tab ── */}
           <TabsContent value="orders" className="space-y-4">
-            {/* Filters */}
+
+            {/* Period + export bar */}
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+                {DATE_FILTER_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setOrderDateFilter(opt.value)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+                      orderDateFilter === opt.value
+                        ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                        : 'bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 shrink-0"
+                onClick={handleExportCSV}
+                disabled={filteredOrders.length === 0}
+              >
+                <Download className="h-4 w-4" />
+                Exportar CSV
+                <span className="ml-1 text-muted-foreground font-normal">({filteredOrders.length})</span>
+              </Button>
+            </div>
+
+            {/* Search + status filter */}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
