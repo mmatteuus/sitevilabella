@@ -27,6 +27,7 @@ import AccountLayout from "@/pages/account/AccountLayout";
 import ProfilePage from "@/pages/account/ProfilePage";
 import AddressesPage from "@/pages/account/AddressesPage";
 import OrdersPage from "@/pages/account/OrdersPage";
+import OrderTrackingPage from "@/pages/OrderTrackingPage";
 import NotFound from "@/pages/NotFound";
 import WishlistPage from "@/pages/WishlistPage";
 
@@ -91,6 +92,7 @@ const App = () => (
                         <Route path="/carrinho" element={<CartPage />} />
                         <Route path="/checkout" element={<CheckoutPage />} />
                         <Route path="/confirmacao" element={<ConfirmationPage />} />
+                        <Route path="/pedido/:id" element={<OrderTrackingPage />} />
                         <Route path="/entrar" element={<AuthPage />} />
                         <Route path="/clube-vb" element={<ClubeVBPage />} />
                         <Route path="/favoritos" element={<WishlistPage />} />
