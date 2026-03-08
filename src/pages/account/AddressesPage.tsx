@@ -34,6 +34,22 @@ const emptyForm = {
   isDefault: false,
 };
 
+type FormErrors = Partial<Record<keyof typeof emptyForm, string>>;
+
+function validateForm(data: typeof emptyForm): FormErrors {
+  const errors: FormErrors = {};
+  if (!data.name.trim()) errors.name = 'Nome do endereço é obrigatório';
+  const cleanZip = data.zipCode.replace(/\D/g, '');
+  if (!cleanZip) errors.zipCode = 'CEP é obrigatório';
+  else if (cleanZip.length !== 8) errors.zipCode = 'CEP deve ter 8 dígitos';
+  if (!data.street.trim()) errors.street = 'Rua é obrigatória';
+  if (!data.number.trim()) errors.number = 'Número é obrigatório';
+  else if (!/^\d+[A-Za-z]?$/.test(data.number.trim())) errors.number = 'Apenas números (ex: 42 ou 42A)';
+  if (!data.neighborhood.trim()) errors.neighborhood = 'Bairro é obrigatório';
+  if (data.state && data.state.length !== 2) errors.state = 'Estado deve ter 2 letras';
+  return errors;
+}
+
 export default function AddressesPage() {
   const { addresses, addAddress, updateAddress, removeAddress } = useAuth();
   const { toast } = useToast();
@@ -41,6 +57,26 @@ export default function AddressesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [cepLoading, setCepLoading] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState<Partial<Record<keyof typeof emptyForm, boolean>>>({});
+
+  // ── Field-level error helper ───────────────────────────────────────────────
+  const touchField = (field: keyof typeof emptyForm) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    const newErrors = validateForm({ ...formData });
+    setErrors(newErrors);
+  };
+
+  const handleFieldChange = <K extends keyof typeof emptyForm>(
+    field: K,
+    value: typeof emptyForm[K]
+  ) => {
+    const updated = { ...formData, [field]: value };
+    setFormData(updated);
+    if (touched[field]) {
+      setErrors(validateForm(updated));
+    }
+  };
 
   // ── ViaCEP lookup ──────────────────────────────────────────────────────────
   const lookupCep = useCallback(async (cep: string) => {
@@ -51,16 +87,20 @@ export default function AddressesPage() {
       const res = await fetch(`https://viacep.com.br/ws/${cleaned}/json/`);
       const data: ViaCepResult = await res.json();
       if (data.erro) {
-        toast({ title: 'CEP não encontrado', variant: 'destructive' });
+        setErrors(prev => ({ ...prev, zipCode: 'CEP não encontrado. Verifique o número.' }));
         return;
       }
-      setFormData(prev => ({
-        ...prev,
-        street: data.logradouro || prev.street,
-        neighborhood: data.bairro || prev.neighborhood,
-        city: data.localidade || prev.city,
-        state: data.uf || prev.state,
-      }));
+      setFormData(prev => {
+        const updated = {
+          ...prev,
+          street: data.logradouro || prev.street,
+          neighborhood: data.bairro || prev.neighborhood,
+          city: data.localidade || prev.city,
+          state: data.uf || prev.state,
+        };
+        setErrors(validateForm(updated));
+        return updated;
+      });
       toast({ title: '✅ Endereço preenchido automaticamente!' });
     } catch {
       toast({ title: 'Erro ao buscar CEP. Verifique sua conexão.', variant: 'destructive' });
@@ -74,14 +114,27 @@ export default function AddressesPage() {
     const formatted = cleaned.length > 5
       ? `${cleaned.slice(0, 5)}-${cleaned.slice(5)}`
       : cleaned;
-    setFormData(prev => ({ ...prev, zipCode: formatted }));
+    handleFieldChange('zipCode', formatted);
     if (cleaned.length === 8) lookupCep(cleaned);
+  };
+
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Allow digits and optionally one trailing letter (e.g. "42A")
+    const val = e.target.value.replace(/[^0-9A-Za-z]/g, '').slice(0, 10);
+    handleFieldChange('number', val);
+  };
+
+  const handleStateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 2);
+    handleFieldChange('state', val);
   };
 
   // ── Dialog helpers ─────────────────────────────────────────────────────────
   const resetForm = () => {
     setFormData(emptyForm);
     setEditingId(null);
+    setErrors({});
+    setTouched({});
   };
 
   const handleOpenDialog = (address?: typeof addresses[0]) => {
@@ -91,11 +144,23 @@ export default function AddressesPage() {
     } else {
       resetForm();
     }
+    setErrors({});
+    setTouched({});
     setIsDialogOpen(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Touch all fields to show all errors
+    const allTouched = Object.keys(emptyForm).reduce(
+      (acc, k) => ({ ...acc, [k]: true }),
+      {} as typeof touched
+    );
+    setTouched(allTouched);
+    const newErrors = validateForm(formData);
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+
     if (editingId) {
       updateAddress(editingId, formData);
       toast({ title: 'Endereço atualizado', description: 'Alterações salvas com sucesso.' });
@@ -116,6 +181,15 @@ export default function AddressesPage() {
     updateAddress(id, { isDefault: true });
     toast({ title: '⭐ Endereço padrão atualizado' });
   };
+
+  // ── Inline error component ─────────────────────────────────────────────────
+  const FieldError = ({ field }: { field: keyof typeof emptyForm }) =>
+    touched[field] && errors[field] ? (
+      <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+        <span className="inline-block w-1 h-1 rounded-full bg-destructive" />
+        {errors[field]}
+      </p>
+    ) : null;
 
   return (
     <div className="rounded-xl border bg-card p-6">
@@ -141,17 +215,19 @@ export default function AddressesPage() {
               </DialogTitle>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               {/* Name */}
               <div>
                 <Label htmlFor="name">Nome do endereço *</Label>
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => handleFieldChange('name', e.target.value)}
+                  onBlur={() => touchField('name')}
                   placeholder="Ex: Casa, Trabalho, Mãe..."
-                  required
+                  className={touched.name && errors.name ? 'border-destructive focus-visible:ring-destructive' : ''}
                 />
+                <FieldError field="name" />
               </div>
 
               {/* CEP with ViaCEP auto-fill */}
@@ -162,17 +238,20 @@ export default function AddressesPage() {
                     id="zipCode"
                     value={formData.zipCode}
                     onChange={handleZipChange}
+                    onBlur={() => touchField('zipCode')}
                     placeholder="77000-000"
                     maxLength={9}
-                    required
+                    inputMode="numeric"
+                    className={touched.zipCode && errors.zipCode ? 'border-destructive focus-visible:ring-destructive' : ''}
                   />
                   {cepLoading && (
                     <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Digite o CEP para preencher o endereço automaticamente
-                </p>
+                {touched.zipCode && errors.zipCode
+                  ? <FieldError field="zipCode" />
+                  : <p className="text-xs text-muted-foreground mt-1">Digite o CEP para preencher automaticamente</p>
+                }
               </div>
 
               {/* Street + Number */}
@@ -182,18 +261,24 @@ export default function AddressesPage() {
                   <Input
                     id="street"
                     value={formData.street}
-                    onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                    required
+                    onChange={(e) => handleFieldChange('street', e.target.value)}
+                    onBlur={() => touchField('street')}
+                    className={touched.street && errors.street ? 'border-destructive focus-visible:ring-destructive' : ''}
                   />
+                  <FieldError field="street" />
                 </div>
                 <div>
                   <Label htmlFor="number">Número *</Label>
                   <Input
                     id="number"
                     value={formData.number}
-                    onChange={(e) => setFormData({ ...formData, number: e.target.value })}
-                    required
+                    onChange={handleNumberChange}
+                    onBlur={() => touchField('number')}
+                    placeholder="42"
+                    inputMode="numeric"
+                    className={touched.number && errors.number ? 'border-destructive focus-visible:ring-destructive' : ''}
                   />
+                  <FieldError field="number" />
                 </div>
               </div>
 
@@ -204,7 +289,7 @@ export default function AddressesPage() {
                   <Input
                     id="complement"
                     value={formData.complement}
-                    onChange={(e) => setFormData({ ...formData, complement: e.target.value })}
+                    onChange={(e) => handleFieldChange('complement', e.target.value)}
                     placeholder="Apto, bloco..."
                   />
                 </div>
@@ -213,32 +298,40 @@ export default function AddressesPage() {
                   <Input
                     id="neighborhood"
                     value={formData.neighborhood}
-                    onChange={(e) => setFormData({ ...formData, neighborhood: e.target.value })}
-                    required
+                    onChange={(e) => handleFieldChange('neighborhood', e.target.value)}
+                    onBlur={() => touchField('neighborhood')}
+                    className={touched.neighborhood && errors.neighborhood ? 'border-destructive focus-visible:ring-destructive' : ''}
                   />
+                  <FieldError field="neighborhood" />
                 </div>
               </div>
 
-              {/* City + State (read-only after CEP fill) */}
+              {/* City + State */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label htmlFor="city">Cidade</Label>
                   <Input
                     id="city"
                     value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    onChange={(e) => handleFieldChange('city', e.target.value)}
                     className={cepLoading ? 'bg-muted/50' : ''}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="state">Estado</Label>
+                  <Label htmlFor="state">Estado (UF)</Label>
                   <Input
                     id="state"
                     value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                    onChange={handleStateChange}
+                    onBlur={() => touchField('state')}
+                    placeholder="TO"
                     maxLength={2}
-                    className={cepLoading ? 'bg-muted/50' : ''}
+                    className={[
+                      cepLoading ? 'bg-muted/50' : '',
+                      touched.state && errors.state ? 'border-destructive focus-visible:ring-destructive' : '',
+                    ].join(' ')}
                   />
+                  <FieldError field="state" />
                 </div>
               </div>
 
@@ -248,7 +341,7 @@ export default function AddressesPage() {
                   id="isDefault"
                   checked={formData.isDefault}
                   onCheckedChange={(checked) =>
-                    setFormData({ ...formData, isDefault: checked as boolean })
+                    handleFieldChange('isDefault', checked as boolean)
                   }
                 />
                 <Label htmlFor="isDefault" className="cursor-pointer">
