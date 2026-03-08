@@ -31,6 +31,23 @@ export default function ProductPage() {
   const [cardSignature, setCardSignature] = useState('');
   const [showMessageForm, setShowMessageForm] = useState(false);
 
+  const imageCount = product?.images.length ?? 1;
+
+  const nextImage = useCallback(() => {
+    setCurrentImageIndex((prev) => (prev + 1) % imageCount);
+  }, [imageCount]);
+
+  const prevImage = useCallback(() => {
+    setCurrentImageIndex((prev) => (prev - 1 + imageCount) % imageCount);
+  }, [imageCount]);
+
+  const handleAddToCart = useCallback(() => {
+    if (!product) return;
+    addItem(product, quantity, selectedVariation ?
+      product.variations?.find(v => v.id === selectedVariation)?.name : undefined
+    );
+  }, [addItem, product, quantity, selectedVariation]);
+
   if (!product) {
     return (
       <div className="container py-16 text-center">
@@ -56,20 +73,6 @@ export default function ProductPage() {
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
-
-  const handleAddToCart = useCallback(() => {
-    addItem(product, quantity, selectedVariation ?
-      product.variations?.find(v => v.id === selectedVariation)?.name : undefined
-    );
-  }, [addItem, product, quantity, selectedVariation]);
-
-  const nextImage = useCallback(() => {
-    setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
-  }, [product.images.length]);
-
-  const prevImage = useCallback(() => {
-    setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
-  }, [product.images.length]);
 
   return (
     <main className="py-8">
