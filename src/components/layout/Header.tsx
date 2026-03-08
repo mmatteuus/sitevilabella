@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, User, Menu, ChevronDown, Phone, X } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, ChevronDown, Phone, X, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import { categories } from '@/data/products';
 import { brand } from '@/config/brand';
 import { SearchAutocomplete } from '@/components/layout/SearchAutocomplete';
