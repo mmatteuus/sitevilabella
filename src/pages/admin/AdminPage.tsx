@@ -379,6 +379,41 @@ function buildChartData(orders: AdminOrder[], filter: DateFilter) {
   }));
 }
 
+// ─── CSV export ───────────────────────────────────────────────────────────────
+function exportToCSV(rows: AdminOrder[], periodLabel: string) {
+  const escape = (v: string | number) => {
+    const s = String(v).replace(/"/g, '""');
+    return /[",\n]/.test(s) ? `"${s}"` : s;
+  };
+
+  const headers = ['Pedido', 'Data', 'Cliente', 'E-mail', 'Telefone', 'Itens', 'Total (R$)', 'Status', 'Endereço', 'Período', 'Pagamento'];
+  const lines = [
+    headers.join(','),
+    ...rows.map(o => [
+      escape(o.id),
+      escape(new Date(o.date).toLocaleString('pt-BR')),
+      escape(o.customer),
+      escape(o.email),
+      escape(o.phone),
+      escape(o.items),
+      escape(o.total.toFixed(2).replace('.', ',')),
+      escape(STATUS_CONFIG[o.status].label),
+      escape(o.address),
+      escape(o.period),
+      escape(o.payment),
+    ].join(',')),
+  ];
+
+  const bom = '\uFEFF'; // UTF-8 BOM for Excel
+  const blob = new Blob([bom + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `pedidos-villa-bella-${periodLabel.toLowerCase().replace(/\s+/g, '-')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ─── Custom Tooltip ───────────────────────────────────────────────────────────
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
   if (!active || !payload?.length) return null;
