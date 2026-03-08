@@ -144,6 +144,14 @@ export const occasions: Occasion[] = [
   },
 ];
 
+// AI-generated product images
+import buqueImg from '@/assets/products/buque-rosas-vermelhas.jpg';
+import girassolImg from '@/assets/products/combo-girassol.jpg';
+import flowerBoxImg from '@/assets/products/flower-box.jpg';
+import ramalheteImg from '@/assets/products/ramalhete-primavera.jpg';
+import rosaUnicaImg from '@/assets/products/rosa-unica.jpg';
+import floresCanecaImg from '@/assets/products/flores-caneca.jpg';
+
 export const products: Product[] = [
   {
     id: "1",
@@ -157,7 +165,7 @@ export const products: Product[] = [
     subcategory: "buque",
     tags: ["romântico", "aniversário", "amor", "rosas"],
     images: [
-      "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=800",
+      buqueImg,
       "https://images.unsplash.com/photo-1494972688394-4cc796f9e4c5?w=800",
       "https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=800",
     ],
@@ -185,7 +193,7 @@ export const products: Product[] = [
     subcategory: "combo-mes",
     tags: ["aniversário", "parabéns", "alegria", "girassol"],
     images: [
-      "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?w=800",
+      girassolImg,
       "https://images.unsplash.com/photo-1551731409-43eb3e517a1a?w=800",
     ],
     addOnsRecommended: ["7", "10"],
@@ -207,7 +215,7 @@ export const products: Product[] = [
     subcategory: "flower-box",
     tags: ["romântico", "luxo", "presente", "especial"],
     images: [
-      "https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=800",
+      flowerBoxImg,
       "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=800",
     ],
     variations: [
@@ -234,7 +242,7 @@ export const products: Product[] = [
     subcategory: "ramalhete",
     tags: ["aniversário", "agradecimento", "simples"],
     images: [
-      "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800",
+      ramalheteImg,
     ],
     addOnsRecommended: ["7"],
     combinaCom: ["2", "6"],
@@ -254,7 +262,7 @@ export const products: Product[] = [
     subcategory: "rosa-unica",
     tags: ["romântico", "amor", "simples", "clássico"],
     images: [
-      "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=800",
+      rosaUnicaImg,
     ],
     variations: [
       { id: "vermelho", name: "Vermelho", color: "#DC2626" },
@@ -280,7 +288,7 @@ export const products: Product[] = [
     subcategory: "flores-caneca",
     tags: ["presente", "aniversário", "útil"],
     images: [
-      "https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=800",
+      floresCanecaImg,
     ],
     addOnsRecommended: ["7", "8"],
     combinaCom: ["4", "5"],
