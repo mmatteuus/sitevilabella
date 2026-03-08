@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Minus, Plus, Heart, Share2, Truck, Shield, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Minus, Plus, Heart, Share2, Truck, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { ProductCard } from '@/components/product/ProductCard';
 import { TrustBadgesCompact } from '@/components/ui/trust-badges';
 import { useCart } from '@/contexts/CartContext';
+import { ImageLightbox, ZoomHint } from '@/components/product/ImageLightbox';
 import { 
   getProductBySlug, 
   getRelatedProducts, 
@@ -25,6 +26,7 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedVariation, setSelectedVariation] = useState(product?.variations?.[0]?.id || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [cardMessage, setCardMessage] = useState('');
   const [cardSignature, setCardSignature] = useState('');
   const [showMessageForm, setShowMessageForm] = useState(false);
