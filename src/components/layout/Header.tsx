@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, User, Menu, ChevronDown, Phone, X } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, ChevronDown, Phone, X, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import { categories } from '@/data/products';
 import { brand } from '@/config/brand';
 import { SearchAutocomplete } from '@/components/layout/SearchAutocomplete';
@@ -26,6 +27,7 @@ export function Header() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { totalItems, setIsCartOpen } = useCart();
   const { isAuthenticated } = useAuth();
+  const { count: wishlistCount } = useWishlist();
   const navigate = useNavigate();
 
   return (
@@ -161,6 +163,17 @@ export function Header() {
             <Link to={isAuthenticated ? '/minha-conta' : '/entrar'}>
               <Button variant="ghost" size="icon" aria-label="Minha conta">
                 <User className="h-5 w-5" />
+              </Button>
+            </Link>
+
+            <Link to="/favoritos" className="relative">
+              <Button variant="ghost" size="icon" aria-label="Favoritos">
+                <Heart className="h-5 w-5" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-medium">
+                    {wishlistCount}
+                  </span>
+                )}
               </Button>
             </Link>
 

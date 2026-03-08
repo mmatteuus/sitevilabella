@@ -2,16 +2,20 @@ import { Link } from 'react-router-dom';
 import { Product } from '@/data/products';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, Eye } from 'lucide-react';
+import { ShoppingBag, Eye, Heart } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 interface ProductCardProps {
   product: Product;
   showQuickAdd?: boolean;
+  showRemoveFromWishlist?: boolean;
 }
 
-export function ProductCard({ product, showQuickAdd = true }: ProductCardProps) {
+export function ProductCard({ product, showQuickAdd = true, showRemoveFromWishlist = false }: ProductCardProps) {
   const { addItem } = useCart();
+  const { toggleItem, isWishlisted } = useWishlist();
+  const wishlisted = isWishlisted(product.id);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -39,6 +43,19 @@ export function ProductCard({ product, showQuickAdd = true }: ProductCardProps) 
         )}
       </div>
 
+      {/* Wishlist heart button */}
+      <button
+        onClick={() => toggleItem(product)}
+        aria-label={wishlisted ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+        className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-200 ${
+          wishlisted
+            ? 'bg-primary text-primary-foreground scale-110'
+            : 'bg-background/80 text-muted-foreground hover:bg-background hover:text-primary'
+        }`}
+      >
+        <Heart className={`h-4 w-4 ${wishlisted ? 'fill-current' : ''}`} />
+      </button>
+
       {/* Image */}
       <Link to={`/produto/${product.slug}`} className="block aspect-square overflow-hidden">
         <img
@@ -51,7 +68,7 @@ export function ProductCard({ product, showQuickAdd = true }: ProductCardProps) 
 
       {/* Quick actions overlay */}
       {showQuickAdd && (
-        <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+        <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto">
           <div className="flex gap-2">
             <Button
               size="icon"
