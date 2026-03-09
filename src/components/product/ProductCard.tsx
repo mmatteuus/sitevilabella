@@ -88,15 +88,15 @@ export function ProductCard({ product, showQuickAdd = true, showRemoveFromWishli
       )}
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-3 md:p-4">
         <Link to={`/produto/${product.slug}`}>
-          <h3 className="font-medium text-sm line-clamp-2 hover:text-primary transition-colors min-h-[2.5rem]">
+          <h3 className="font-medium text-xs md:text-sm line-clamp-2 hover:text-primary transition-colors min-h-[2.5rem]">
             {product.name}
           </h3>
         </Link>
         
         {/* Rating */}
-        <div className="flex items-center gap-1 mt-2">
+        <div className="flex items-center gap-1 mt-1.5">
           <div className="flex">
             {[...Array(5)].map((_, i) => (
               <svg
@@ -113,19 +113,19 @@ export function ProductCard({ product, showQuickAdd = true, showRemoveFromWishli
         </div>
 
         {/* Price */}
-        <div className="mt-3 flex items-baseline gap-2">
-          <span className="text-lg font-bold text-primary">{formatPrice(product.price)}</span>
+        <div className="mt-2 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+          <span className="text-base md:text-lg font-bold text-primary leading-tight">{formatPrice(product.price)}</span>
           {product.originalPrice && (
-            <span className="text-sm text-muted-foreground line-through">
+            <span className="text-xs md:text-sm text-muted-foreground line-through">
               {formatPrice(product.originalPrice)}
             </span>
           )}
         </div>
 
         {/* Fast delivery badge */}
-        <div className="mt-3 flex items-center gap-1 text-xs text-success">
-          <span className="inline-block w-1.5 h-1.5 bg-success rounded-full" />
-          Entrega em até 3h
+        <div className="mt-2 flex items-center gap-1 text-xs text-success">
+          <span className="inline-block w-1.5 h-1.5 shrink-0 bg-success rounded-full" />
+          <span className="truncate">Entrega em até 3h</span>
         </div>
       </div>
     </div>
