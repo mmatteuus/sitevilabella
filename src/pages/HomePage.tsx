@@ -89,18 +89,18 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className="container relative z-10 py-24">
+        <div className="container relative z-10 py-20 md:py-24">
           <div className="max-w-xl text-primary-foreground">
             <div
-              className="inline-flex items-center gap-2 bg-primary/90 text-primary-foreground px-4 py-2 rounded-full text-sm mb-6"
+              className="inline-flex items-center gap-2 bg-primary/90 text-primary-foreground px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm mb-5 md:mb-6"
               style={{ animation: 'slideDown 0.6s ease-out forwards', opacity: 0 }}
             >
-              <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
+              <span className="w-2 h-2 shrink-0 bg-success rounded-full animate-pulse" />
               {brand.delivery.promiseShort}
             </div>
 
             <h1
-              className="font-display text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight"
               style={{ animation: 'slideUp 0.7s 0.1s ease-out forwards', opacity: 0 }}
             >
               Flores que<br />
@@ -111,7 +111,7 @@ export default function HomePage() {
             </h1>
 
             <p
-              className="text-lg md:text-xl text-primary-foreground/90 mb-8"
+              className="text-base md:text-lg lg:text-xl text-primary-foreground/90 mb-6 md:mb-8"
               style={{ animation: 'slideUp 0.7s 0.2s ease-out forwards', opacity: 0 }}
             >
               Especialistas em plantar flores e colher sorrisos.
@@ -119,16 +119,16 @@ export default function HomePage() {
             </p>
 
             <div
-              className="flex flex-col sm:flex-row gap-4"
+              className="flex flex-col sm:flex-row gap-3 md:gap-4"
               style={{ animation: 'slideUp 0.7s 0.35s ease-out forwards', opacity: 0 }}
             >
-              <Button asChild variant="hero" size="xl">
+              <Button asChild variant="hero" size="xl" className="w-full sm:w-auto">
                 <Link to="/loja">
                   Comprar agora
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="xl" className="bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20">
+              <Button asChild variant="outline" size="xl" className="w-full sm:w-auto bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20">
                 <Link to="/clube-vb">
                   Assine o Clube VB
                 </Link>
