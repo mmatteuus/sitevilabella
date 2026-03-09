@@ -95,16 +95,16 @@ export default function ProductPage() {
         )}
 
         {/* Breadcrumb */}
-        <nav className="text-sm text-muted-foreground mb-6">
-          <Link to="/" className="hover:text-primary">Home</Link>
-          <span className="mx-2">/</span>
-          <Link to="/loja" className="hover:text-primary">Loja</Link>
-          <span className="mx-2">/</span>
-          <Link to={`/categoria/${product.category}`} className="hover:text-primary capitalize">
+        <nav className="text-sm text-muted-foreground mb-6 flex flex-wrap items-center gap-x-1 gap-y-0.5 min-w-0">
+          <Link to="/" className="hover:text-primary shrink-0">Home</Link>
+          <span className="shrink-0">/</span>
+          <Link to="/loja" className="hover:text-primary shrink-0">Loja</Link>
+          <span className="shrink-0">/</span>
+          <Link to={`/categoria/${product.category}`} className="hover:text-primary capitalize shrink-0">
             {product.category}
           </Link>
-          <span className="mx-2">/</span>
-          <span className="text-foreground">{product.name}</span>
+          <span className="shrink-0">/</span>
+          <span className="text-foreground truncate min-w-0">{product.name}</span>
         </nav>
 
         {/* Product Detail */}
